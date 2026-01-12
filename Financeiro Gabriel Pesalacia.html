@@ -1,0 +1,2774 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Financeiro Gabriel Pesalacia</title>
+
+  <!-- FAVICON SVG (G corporativo azul) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%230ea5e9%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%231d4ed8%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2716%27%20fill%3D%27url(%23g)%27/%3E%3Crect%20x%3D%276%27%20y%3D%276%27%20width%3D%2752%27%20height%3D%2752%27%20rx%3D%2714%27%20fill%3D%27none%27%20stroke%3D%27%23ffffff%27%20stroke-opacity%3D%270.35%27%20stroke-width%3D%272%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2743%27%20text-anchor%3D%27middle%27%20font-family%3D%27system-ui%2CSegoe%20UI%2CRoboto%2CArial%27%20font-size%3D%2734%27%20font-weight%3D%27800%27%20fill%3D%27%23ffffff%27%3EG%3C/text%3E%3C/svg%3E" />
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --muted2: rgba(255,255,255,.45);
+
+      --accent: #2aa9ff;
+      --accent2: #1d4ed8;
+
+      --danger: #fb7185;
+      --ok: #34d399;
+      --warn: #fbbf24;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 14px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    html{ color-scheme: dark; }
+    [data-theme="light"]{ color-scheme: light; }
+    [data-theme="light"]{
+      --bg: #f5f7ff;
+      --panel: rgba(15,23,42,.05);
+      --panel2: rgba(15,23,42,.06);
+      --border: rgba(15,23,42,.14);
+      --text: rgba(15,23,42,.92);
+      --muted: rgba(15,23,42,.65);
+      --muted2: rgba(15,23,42,.45);
+      --shadow: 0 18px 50px rgba(2,6,23,.18);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      background: var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* Fundo fixo (não rola por cima) */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(42,169,255,.18), transparent 60%),
+        radial-gradient(1000px 500px at 90% 10%, rgba(29,78,216,.16), transparent 60%),
+        radial-gradient(900px 500px at 40% 100%, rgba(251,191,36,.10), transparent 60%);
+    }
+
+    button, input, select, textarea { font-family:inherit; }
+
+    /* Fix corte: grid minmax + min-width 0 */
+    .app{
+      display:grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height:100vh;
+    }
+
+    .sidebar{
+      position:sticky; top:0; height:100vh;
+      padding:20px;
+      border-right:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      background: var(--panel);
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.15)),
+                  linear-gradient(135deg, var(--accent), var(--accent2));
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.35);
+      transform: rotate(12deg);
+    }
+    .brand h1{ font-size:14px; margin:0; line-height:1.2; letter-spacing:.2px; }
+    .brand p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+
+    .nav{ margin-top:16px; display:flex; flex-direction:column; gap:8px; }
+    .nav button{
+      width:100%;
+      display:flex; align-items:center; gap:10px;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid transparent;
+      background:transparent;
+      color:var(--text);
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .nav button:hover{ background: var(--panel); border-color: var(--border); }
+    .nav button.active{
+      background: linear-gradient(135deg, rgba(42,169,255,.22), rgba(29,78,216,.12));
+      border-color: rgba(42,169,255,.28);
+      box-shadow: 0 12px 30px rgba(42,169,255,.12);
+    }
+    .nav .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.25);
+      border:1px solid var(--border);
+    }
+    .nav button.active .dot{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: rgba(255,255,255,.35);
+    }
+
+    .side-footer{ margin-top:auto; padding-top:16px; display:flex; flex-direction:column; gap:10px; }
+    .side-card{
+      padding:12px;
+      border-radius:14px;
+      background: var(--panel);
+      border:1px solid var(--border);
+    }
+    .side-row{ display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); }
+    .side-row strong{ color:var(--text); font-weight:650; }
+
+    .main{
+      padding:22px 22px 36px;
+      min-width:0;
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; margin-bottom:16px;
+      min-width:0;
+    }
+    .topbar .left{
+      display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+      min-width:0;
+    }
+    .title{ font-size:20px; margin:0; letter-spacing:.2px; }
+    .subtitle{ margin:0; font-size:13px; color:var(--muted); }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: var(--panel);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      transition:.18s ease;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: var(--panel2); }
+    .btn.primary{
+      border-color: rgba(42,169,255,.35);
+      background: linear-gradient(135deg, rgba(42,169,255,.28), rgba(29,78,216,.14));
+    }
+    .btn.danger{
+      border-color: rgba(251,113,133,.35);
+      background: linear-gradient(135deg, rgba(251,113,133,.22), rgba(42,169,255,.10));
+    }
+    .btn.ghost{ background: transparent; box-shadow:none; }
+
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--panel);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .chip strong{ color:var(--text); font-weight:650; }
+
+    .card{
+      border-radius: var(--radius);
+      background: var(--panel);
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-width:0;
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 14px 10px;
+      gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      min-width:0;
+    }
+    [data-theme="light"] .card .hd{ border-bottom:1px solid rgba(15,23,42,.06); }
+    .card .hd h3{ margin:0; font-size:13px; letter-spacing:.2px; }
+    .card .bd{ padding:14px; min-width:0; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; min-width:0; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; min-width: 160px; }
+    .field label{ font-size:12px; color:var(--muted); }
+
+    .input, select, textarea{
+      width:100%;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+      transition:.18s ease;
+      min-width:0;
+    }
+    textarea{ min-height:90px; resize:vertical; }
+    [data-theme="light"] .input, [data-theme="light"] select, [data-theme="light"] textarea{
+      background: rgba(15,23,42,.03);
+    }
+
+    /* Select/options sempre legíveis */
+    select{ color: var(--text); }
+    select option{ color: var(--text); background-color: var(--bg); }
+    [data-theme="light"] select option{ color: rgba(15,23,42,.92); background-color: #ffffff; }
+
+    .input:focus, select:focus, textarea:focus{
+      border-color: rgba(42,169,255,.42);
+      box-shadow: 0 0 0 4px rgba(42,169,255,.18);
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      min-width:0;
+    }
+    [data-theme="light"] .table-wrap{ border-color: rgba(15,23,42,.10); }
+
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width: 1240px; }
+    thead th{
+      position:sticky; top:0; z-index:2;
+      background: rgba(20,25,45,.78);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:12px 10px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:left;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+    }
+    [data-theme="light"] thead th{
+      background: rgba(245,247,255,.88);
+      border-bottom-color: rgba(15,23,42,.10);
+    }
+    tbody td{
+      padding:12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:13px;
+      color:var(--text);
+      white-space:nowrap;
+      vertical-align:top;
+    }
+    [data-theme="light"] tbody td{ border-bottom-color: rgba(15,23,42,.06); }
+    tbody tr:hover td{ background: rgba(255,255,255,.03); }
+
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .amt-in{ color: var(--ok); font-weight:750; }
+    .amt-out{ color: var(--danger); font-weight:750; }
+    .amt-xfer{ color: var(--accent); font-weight:750; }
+
+    .muted{ color:var(--muted); }
+    .right{ text-align:right; }
+    .nowrap{ white-space:nowrap; }
+
+    .tabs{ display:none; min-width:0; }
+    .tabs.active{ display:block; }
+
+    /* ===== Barras de grupo com marcações ===== */
+    .group-card{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      cursor:pointer;
+      user-select:none;
+    }
+    [data-theme="light"] .group-card{
+      border-color: rgba(15,23,42,.10);
+      background: rgba(15,23,42,.02);
+    }
+    .group-card:hover{
+      background: rgba(255,255,255,.05);
+    }
+
+    .group-top{
+      display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+      min-width:0;
+    }
+    .group-top strong{ font-size:13px; }
+    .group-top span{ font-size:12px; color:var(--muted); white-space:nowrap; }
+
+    .group-sub{
+      margin-top:6px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .bar-wrap{
+      margin-top:10px;
+      position:relative;
+      padding-top:34px; /* espaço pras setas/labels */
+    }
+    .bar{
+      height:12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      position:relative;
+    }
+    [data-theme="light"] .bar{
+      background: rgba(15,23,42,.06);
+      border-color: rgba(15,23,42,.10);
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+    .marker{
+      position:absolute;
+      top:0;
+      transform: translateX(-50%);
+      text-align:center;
+      min-width: 64px;
+      pointer-events:none;
+    }
+    .marker .label{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.1;
+      background: rgba(0,0,0,.12);
+      border:1px solid rgba(255,255,255,.10);
+      padding:4px 6px;
+      border-radius:10px;
+      backdrop-filter: blur(8px);
+      display:inline-block;
+      white-space:nowrap;
+    }
+    [data-theme="light"] .marker .label{
+      background: rgba(245,247,255,.80);
+      border-color: rgba(15,23,42,.10);
+    }
+    .marker .tri{
+      width:0; height:0;
+      border-left:6px solid transparent;
+      border-right:6px solid transparent;
+      border-top:8px solid rgba(255,255,255,.35);
+      margin:6px auto 0;
+    }
+    [data-theme="light"] .marker .tri{
+      border-top-color: rgba(15,23,42,.35);
+    }
+
+    .details{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+    [data-theme="light"] .details{
+      border-color: rgba(15,23,42,.10);
+      background: rgba(15,23,42,.02);
+    }
+    .details h4{
+      margin:0 0 8px 0;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .subrow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 8px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      margin-bottom:8px;
+    }
+    [data-theme="light"] .subrow{
+      border-color: rgba(15,23,42,.10);
+      background: rgba(15,23,42,.02);
+    }
+
+    .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center; justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .modal.open{ display:flex; }
+    .modal-card{
+      width:min(1020px, 96vw);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 28px 90px rgba(0,0,0,.55);
+      overflow:hidden;
+      backdrop-filter: blur(12px);
+    }
+    [data-theme="light"] .modal-card{
+      background: linear-gradient(180deg, rgba(245,247,255,.95), rgba(245,247,255,.88));
+      border-color: rgba(15,23,42,.14);
+    }
+    .modal-hd{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    [data-theme="light"] .modal-hd{ border-bottom-color: rgba(15,23,42,.10); }
+    .modal-hd h2{ margin:0; font-size:14px; }
+    .modal-bd{ padding:14px 16px 16px; }
+    .modal-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+    .span-2{ grid-column: span 2; }
+    .span-3{ grid-column: span 3; }
+    .span-4{ grid-column: span 4; }
+
+    @media (max-width: 980px){
+      .app{ grid-template-columns: 1fr; }
+      .sidebar{ height:auto; position:relative; border-right:none; border-bottom:1px solid var(--border); }
+      .modal-grid{ grid-template-columns: 1fr; }
+      .span-2, .span-3, .span-4{ grid-column:auto; }
+      table{ min-width: 980px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Financeiro</h1>
+          <p>Fixas • Variáveis • Investimentos</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-tab="dashboard"><span class="dot"></span> Dashboard</button>
+        <button data-tab="resumo"><span class="dot"></span> Resumo</button>
+        <button data-tab="lancamentos"><span class="dot"></span> Lançamentos</button>
+        <button data-tab="regras"><span class="dot"></span> Regras & Categorias</button>
+        <button data-tab="config"><span class="dot"></span> Contas & Cartões</button>
+      </nav>
+
+      <div class="side-footer">
+        <div class="side-card">
+          <div class="side-row"><span>Mês</span><strong id="sideMonth">—</strong></div>
+          <div class="side-row"><span>USD→BRL</span><strong id="sideFx">—</strong></div>
+          <div class="side-row"><span>Fixo (BRL)</span><strong id="sideFixedBRL">—</strong></div>
+        </div>
+        <div class="side-card">
+          <div class="side-row"><span>Saldo realizado</span><strong id="sideReal">—</strong></div>
+          <div class="side-row"><span>Saldo projetado</span><strong id="sideProj">—</strong></div>
+          <div class="side-row"><span>Status</span><strong id="saveStatus">salvo</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="left">
+          <h2 class="title" id="pageTitle">Dashboard</h2>
+          <p class="subtitle" id="pageSubtitle">3 barras + detalhamento ao clicar</p>
+        </div>
+
+        <div class="actions">
+          <span class="chip">Realizado: <strong id="chipReal">—</strong></span>
+          <span class="chip">Projetado: <strong id="chipProj">—</strong></span>
+          <span class="chip">Cartão (mês): <strong id="chipCardMonth">—</strong></span>
+          <button class="btn ghost" id="btnTheme">🌓 Tema</button>
+          <button class="btn primary" id="btnAdd">＋ Novo lançamento</button>
+          <button class="btn" id="btnExportJSON">⤓ JSON</button>
+          <label class="btn" for="fileImport">⤒ Importar</label>
+          <input id="fileImport" type="file" accept=".json" hidden />
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="hd">
+          <h3>Filtros & Mês de referência (calendário)</h3>
+          <div class="row">
+            <button class="btn" id="btnThisMonth">Este mês</button>
+            <button class="btn" id="btnAll">Tudo</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label for="budgetMonth">Mês (limites/relatórios)</label>
+              <input class="input" id="budgetMonth" type="month" />
+            </div>
+
+            <div class="field">
+              <label for="fStart">Data início</label>
+              <input class="input" id="fStart" type="date" />
+            </div>
+            <div class="field">
+              <label for="fEnd">Data fim</label>
+              <input class="input" id="fEnd" type="date" />
+            </div>
+
+            <div class="field">
+              <label for="fType">Tipo</label>
+              <select id="fType">
+                <option value="all">Tudo</option>
+                <option value="in">Entradas</option>
+                <option value="out">Saídas</option>
+                <option value="transfer">Transferências</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="fSubcat">Subcategoria</label>
+              <select id="fSubcat"></select>
+            </div>
+
+            <div class="field">
+              <label for="fPay">Pagamento</label>
+              <select id="fPay">
+                <option value="all">Todos</option>
+                <option value="Cartão">Cartão</option>
+                <option value="PIX">PIX</option>
+                <option value="Débito">Débito</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Transferência">Transferência</option>
+              </select>
+            </div>
+
+            <div class="field" style="min-width:260px; flex:1;">
+              <label for="fSearch">Busca</label>
+              <input class="input" id="fSearch" placeholder="Ex: mercado, aluguel, vivo..." />
+            </div>
+          </div>
+
+          <p class="hint" id="fxNote" style="margin-top:10px;">—</p>
+        </div>
+      </div>
+
+      <!-- Dashboard -->
+      <section id="tab-dashboard" class="tabs active">
+  <div class="card" style="margin-bottom:16px;">
+    <div class="hd">
+      <h3>Dashboard</h3>
+      <span class="muted">Gráficos e indicadores</span>
+    </div>
+    <div class="bd">
+      <div class="row">
+        <span class="chip">Realizado: <strong id="dashReal">—</strong></span>
+        <span class="chip">Projetado: <strong id="dashProj">—</strong></span>
+        <span class="chip">Cartão (mês): <strong id="dashCard">—</strong></span>
+      </div>
+      <p class="hint" style="margin-top:10px;">O resumo (3 barras) está na aba <b>Resumo</b>.</p>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1.2fr .8fr; gap:16px;">
+    <div class="card">
+      <div class="hd">
+        <h3>Fluxo de caixa (12 meses)</h3>
+        <span class="muted">Entradas x saídas que afetam o saldo</span>
+      </div>
+      <div class="bd">
+        <canvas id="chartCashflow" height="140"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <h3>Gastos por subcategoria</h3>
+        <span class="muted">Inclui compras no cartão</span>
+      </div>
+      <div class="bd">
+        <canvas id="chartCategories" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; margin-top:16px;">
+    <div class="card">
+      <div class="hd">
+        <h3>Projeção de saldo (90 dias)</h3>
+        <span class="muted">Modelo atual</span>
+      </div>
+      <div class="bd">
+        <canvas id="chartProjection" height="140"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <h3>Saldo por conta (hoje)</h3>
+        <span class="muted">Realizado</span>
+      </div>
+      <div class="bd">
+        <canvas id="chartAccounts" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+      <section id="tab-resumo" class="tabs">
+<div class="card">
+          <div class="hd">
+            <h3>Resumo do mês (3 barras)</h3>
+            <span class="muted" id="monthSummary">—</span>
+          </div>
+          <div class="bd">
+            <div id="groupsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="groupDetailsMount"></div>
+
+            <p class="hint" style="margin-top:12px;">
+              Clique numa barra para ver as subcategorias daquele grupo.
+            </p>
+          </div>
+        </div>
+</section>
+
+      <!-- Lançamentos -->
+      <section id="tab-lancamentos" class="tabs">
+        <div class="card">
+          <div class="hd">
+            <h3>Lançamentos</h3>
+            <div class="row">
+              <span class="chip">Entradas: <strong id="sumIn">—</strong></span>
+              <span class="chip">Saídas: <strong id="sumOut">—</strong></span>
+              <span class="chip">Líquido: <strong id="sumNet">—</strong></span>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-sort="date">Data</th>
+                    <th data-sort="type">Tipo</th>
+                    <th data-sort="desc">Descrição</th>
+                    <th data-sort="group">Grupo</th>
+                    <th data-sort="subcat">Subcategoria</th>
+                    <th data-sort="pay">Pagamento</th>
+                    <th class="right" data-sort="amount">Valor (BRL)</th>
+                    <th class="right" data-sort="balance">Saldo (após)</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="txBody"></tbody>
+              </table>
+            </div>
+
+            <div class="row" style="margin-top:12px; justify-content:space-between;">
+              <div class="row">
+                <span class="muted" id="txCount">—</span>
+                <span class="muted">•</span>
+                <span class="muted" id="sortInfo">—</span>
+              </div>
+              <div class="row">
+                <button class="btn" id="btnClearFilters">Limpar filtros</button>
+                <button class="btn danger" id="btnReset">Resetar dados</button>
+              </div>
+            </div>
+
+            <p class="hint" style="margin-top:10px;">
+              Compra no cartão não mexe no saldo. Pagamento de fatura mexe no saldo, mas não entra nos limites.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Regras & Categorias -->
+      <section id="tab-regras" class="tabs">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="hd">
+            <h3>Salário fixo (USD) & Cotação do mês</h3>
+            <span class="muted">cotação automática salva por mês</span>
+          </div>
+          <div class="bd">
+            <div class="row" style="align-items:flex-end;">
+              <div class="field">
+                <label for="fixedUSD">Salário fixo (USD)</label>
+                <input class="input" id="fixedUSD" type="number" step="0.01" placeholder="475" />
+              </div>
+              <div class="field">
+                <label for="fxMonthPick">Mês (cotação)</label>
+                <input class="input" id="fxMonthPick" type="month" />
+              </div>
+              <div class="field">
+                <label for="fxManual">USD→BRL (manual)</label>
+                <input class="input" id="fxManual" type="number" step="0.0001" placeholder="ex: 5.1200" />
+              </div>
+              <button class="btn" id="btnFxNow">Atualizar cotação agora</button>
+              <button class="btn primary" id="btnFxSave">Salvar cotação do mês</button>
+            </div>
+            <p class="hint" id="fxConfigHint" style="margin-top:10px;">—</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="hd">
+            <h3>Grupos (percentuais e limites)</h3>
+            <span class="muted">ex.: 50/30/20</span>
+          </div>
+          <div class="bd">
+            <div class="table-wrap">
+              <table style="min-width:900px;">
+                <thead>
+                  <tr>
+                    <th>Grupo</th>
+                    <th class="right">%</th>
+                    <th>Ativo nos limites</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="groupsAdminBody"></tbody>
+              </table>
+            </div>
+
+            <div class="row" style="margin-top:12px; align-items:flex-end;">
+              <div class="field" style="min-width:220px;">
+                <label for="newGroupName">Novo grupo</label>
+                <input class="input" id="newGroupName" placeholder="Ex: Ajustes" />
+              </div>
+              <div class="field">
+                <label for="newGroupPct">% (0 a 100)</label>
+                <input class="input" id="newGroupPct" type="number" step="0.1" min="0" max="100" value="5" />
+              </div>
+              <button class="btn primary" id="btnAddGroup">Adicionar grupo</button>
+            </div>
+
+            <p class="hint" style="margin-top:10px;">
+              O limite Estável = % × salário fixo (convertido). O Flexível = % × renda total do mês.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Subcategorias (gerenciar e mover entre grupos)</h3>
+            <span class="muted">você controla tudo aqui</span>
+          </div>
+          <div class="bd">
+            <div class="table-wrap">
+              <table style="min-width:1100px;">
+                <thead>
+                  <tr>
+                    <th>Subcategoria</th>
+                    <th>Tipo</th>
+                    <th>Grupo</th>
+                    <th>Entra nos limites</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="subcatsAdminBody"></tbody>
+              </table>
+            </div>
+
+            <div class="row" style="margin-top:12px; align-items:flex-end;">
+              <div class="field" style="min-width:220px;">
+                <label for="newSubName">Nova subcategoria</label>
+                <input class="input" id="newSubName" placeholder="Ex: Veterinário" />
+              </div>
+              <div class="field">
+                <label for="newSubType">Tipo</label>
+                <select id="newSubType">
+                  <option value="expense">Despesa</option>
+                  <option value="income">Receita</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="newSubGroup">Grupo (se despesa)</label>
+                <select id="newSubGroup"></select>
+              </div>
+              <button class="btn primary" id="btnAddSubcat">Adicionar subcategoria</button>
+            </div>
+
+            <p class="hint" style="margin-top:10px;">
+              Para receitas, o grupo não é usado. Para despesas, escolha o grupo (Fixas/Variáveis/Investimentos).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contas & Cartões -->
+      <section id="tab-config" class="tabs">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="hd">
+            <h3>Contas</h3>
+            <span class="muted">saldo realizado/projetado</span>
+          </div>
+          <div class="bd">
+            <div class="row" style="align-items:flex-end;">
+              <div class="field" style="min-width:220px;">
+                <label for="accName">Nome</label>
+                <input class="input" id="accName" placeholder="Ex: Inter" />
+              </div>
+              <div class="field">
+                <label for="accOpening">Saldo inicial (BRL)</label>
+                <input class="input" id="accOpening" type="number" step="0.01" value="0" />
+              </div>
+              <button class="btn primary" id="btnAddAccount">Adicionar conta</button>
+            </div>
+
+            <div class="table-wrap" style="margin-top:12px;">
+              <table style="min-width:760px;">
+                <thead>
+                  <tr>
+                    <th>Conta</th>
+                    <th class="right">Inicial</th>
+                    <th class="right">Hoje</th>
+                    <th class="right">Proj. (90d)</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="accountsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hd">
+            <h3>Cartões</h3>
+            <span class="muted">relatório calendário + gerar pagamento (opcional)</span>
+          </div>
+          <div class="bd">
+            <div class="row" style="align-items:flex-end;">
+              <div class="field" style="min-width:220px;">
+                <label for="cardName">Nome</label>
+                <input class="input" id="cardName" placeholder="Ex: Nubank" />
+              </div>
+              <div class="field">
+                <label for="cardLimit">Limite (BRL)</label>
+                <input class="input" id="cardLimit" type="number" step="0.01" value="5000" />
+              </div>
+              <button class="btn primary" id="btnAddCard">Adicionar cartão</button>
+            </div>
+
+            <div class="table-wrap" style="margin-top:12px;">
+              <table style="min-width:860px;">
+                <thead>
+                  <tr>
+                    <th>Cartão</th>
+                    <th class="right">Limite</th>
+                    <th class="right">Gasto no mês</th>
+                    <th class="right">Disponível</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="cardsBody"></tbody>
+              </table>
+            </div>
+
+            <p class="hint" style="margin-top:10px;">
+              Aqui é relatório calendário. O cartão é meio de pagamento — não muda se é fixa ou variável.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal -->
+      <div class="modal" id="modal">
+        <div class="modal-card">
+          <div class="modal-hd">
+            <h2 id="modalTitle">Novo lançamento</h2>
+            <div class="row">
+              <button class="btn ghost" id="btnClose">✕ Fechar</button>
+            </div>
+          </div>
+
+          <div class="modal-bd">
+            <div class="modal-grid">
+              <div class="field">
+                <label for="mDate">Data</label>
+                <input class="input" id="mDate" type="date" />
+              </div>
+
+              <div class="field">
+                <label for="mType">Tipo</label>
+                <select id="mType">
+                  <option value="in">Entrada</option>
+                  <option value="out">Saída</option>
+                  <option value="transfer">Transferência</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="mCurrency">Moeda</label>
+                <select id="mCurrency">
+                  <option value="BRL">BRL (R$)</option>
+                  <option value="USD">USD ($)</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="mAmount">Valor (moeda)</label>
+                <input class="input" id="mAmount" type="number" step="0.01" placeholder="0,00" />
+              </div>
+
+              <div class="field">
+                <label for="mAmountBRL">Convertido (BRL)</label>
+                <input class="input" id="mAmountBRL" type="text" disabled />
+              </div>
+
+              <div class="field span-2">
+                <label for="mDesc">Descrição</label>
+                <input class="input" id="mDesc" placeholder="Ex: Conta Vivo, Mercado..." />
+              </div>
+
+              <div class="field">
+                <label for="mSubcat">Subcategoria</label>
+                <select id="mSubcat"></select>
+              </div>
+
+              <div class="field" id="wrapPay">
+                <label for="mPay">Pagamento</label>
+                <select id="mPay">
+                  <option>PIX</option>
+                  <option>Débito</option>
+                  <option>Dinheiro</option>
+                  <option>Transferência</option>
+                  <option>Cartão</option>
+                </select>
+              </div>
+
+              <div class="field" id="wrapCardPick" style="display:none;">
+                <label for="mCard">Qual cartão?</label>
+                <select id="mCard"></select>
+              </div>
+
+              <div class="field" id="wrapAccountPick">
+                <label for="mAccount">Conta</label>
+                <select id="mAccount"></select>
+              </div>
+
+              <div class="field" id="wrapFrom">
+                <label for="mFrom">Origem</label>
+                <select id="mFrom"></select>
+              </div>
+
+              <div class="field" id="wrapTo">
+                <label for="mTo">Destino</label>
+                <select id="mTo"></select>
+              </div>
+
+              <div class="field">
+                <label for="mInstallments">Parcelas</label>
+                <input class="input" id="mInstallments" type="number" min="1" max="60" step="1" value="1" />
+              </div>
+
+              <div class="field">
+                <label for="mInterest">Juros a.m. (%)</label>
+                <input class="input" id="mInterest" type="number" step="0.01" min="0" placeholder="0,00" />
+              </div>
+
+              <div class="field span-4">
+                <label for="mNotes">Observações</label>
+                <textarea id="mNotes" placeholder="Detalhes..."></textarea>
+              </div>
+            </div>
+
+            <div class="row" style="justify-content:space-between; margin-top:14px;">
+              <p class="hint" id="modalHint">USD→BRL usa a cotação do mês do lançamento.</p>
+              <div class="row">
+                <button class="btn danger" id="btnDelete" style="display:none;">🗑 Excluir</button>
+                <button class="btn primary" id="btnSave">Salvar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    /***********************
+     * Financeiro (final)
+     * - 3 grupos (fixas/variáveis/investimentos) com barras (estável/flexível)
+     * - Subcategorias gerenciáveis e movíveis entre grupos
+     * - Cartão = meio de pagamento (relatório calendário)
+     * - USD->BRL automático por mês (salvo)
+     ***********************/
+
+    const STORAGE_KEY = "financeiro_gabriel_final_v1";
+
+    const fmt = { locale:"pt-BR", currency:"BRL" };
+    const nf = ()=> new Intl.NumberFormat(fmt.locale, { style:"currency", currency: fmt.currency });
+    const money = (n)=> nf().format(Number(n||0));
+
+    const el = (id)=>document.getElementById(id);
+    const $$ = (sel, root=document)=>Array.from(root.querySelectorAll(sel));
+
+    const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
+    const uid = ()=> (crypto?.randomUUID ? crypto.randomUUID() : ("id_"+Math.random().toString(16).slice(2)+"_"+Date.now().toString(16)));
+
+    const toISODate = (d)=>{
+      const x = new Date(d);
+      const y=x.getFullYear();
+      const m=String(x.getMonth()+1).padStart(2,"0");
+      const day=String(x.getDate()).padStart(2,"0");
+      return `${y}-${m}-${day}`;
+    };
+    const parseDateISO = (s)=>{
+      const [y,m,d] = (s||"").split("-").map(Number);
+      if(!y||!m||!d) return null;
+      return new Date(y, m-1, d);
+    };
+    const nowMonthKey = ()=>{
+      const n = new Date();
+      return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
+    };
+    const monthKeyFromISO = (iso)=> String(iso||"").slice(0,7);
+
+    function setSaveStatus(txt){
+      el("saveStatus").textContent = txt;
+    }
+
+    async function fetchUsdBrl(){
+      const url = "https://open.er-api.com/v6/latest/USD";
+      const res = await fetch(url, { cache:"no-store" });
+      if(!res.ok) throw new Error("FX fetch failed");
+      const data = await res.json();
+      const rate = data?.rates?.BRL;
+      if(!rate) throw new Error("FX missing BRL");
+      return { rate: Number(rate), source: "open.er-api.com" };
+    }
+
+    // ===== STATE =====
+    const state = {
+      theme: "dark",
+
+      // Config
+      fixedSalaryUSD: 475,
+      fxByMonth: {}, // {"YYYY-MM": {usdbrl, fetchedAt, source}}
+
+      budgetMonth: nowMonthKey(),
+
+      // Groups (3 barras principais por default)
+      groups: [
+        { id:"fixed", name:"Despesas fixas", pct:50, enabled:true },
+        { id:"variable", name:"Despesas variáveis", pct:30, enabled:true },
+        { id:"invest", name:"Investimentos", pct:20, enabled:true },
+      ],
+
+      // Subcategories (gerenciáveis)
+      // type: "expense" | "income"
+      subcats: [
+        // income
+        { id:"inc_salary", name:"Salário", type:"income", groupId:null, include:true },
+        { id:"inc_comm", name:"Comissão", type:"income", groupId:null, include:true },
+        { id:"inc_other", name:"Outras receitas", type:"income", groupId:null, include:true },
+
+        // fixed (necessidades)
+        { id:"fix_housing", name:"Moradia", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_food", name:"Alimentação", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_health", name:"Saúde", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_edu", name:"Educação", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_taxes", name:"Impostos", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_gym", name:"Academia", type:"expense", groupId:"fixed", include:true },
+        { id:"fix_bills", name:"Contas", type:"expense", groupId:"fixed", include:true },
+
+        // variable (desejos)
+        { id:"var_subs", name:"Assinaturas", type:"expense", groupId:"variable", include:true },
+        { id:"var_fun", name:"Lazer", type:"expense", groupId:"variable", include:true },
+        { id:"var_shop", name:"Compras", type:"expense", groupId:"variable", include:true },
+        { id:"var_don", name:"Doações", type:"expense", groupId:"variable", include:true },
+        { id:"var_other", name:"Outros", type:"expense", groupId:"variable", include:true },
+
+        // investments
+        { id:"inv_main", name:"Investimentos", type:"expense", groupId:"invest", include:true },
+
+        // internal (não entra em limites)
+        { id:"sys_ccpay", name:"Pagamento fatura (sistema)", type:"expense", groupId:"variable", include:false },
+      ],
+
+      // Accounts/Cards
+      accounts: [{ id:"acc_main", name:"Principal", opening: 0 }],
+      cards: [{ id:"card_main", name:"Cartão", limit: 5000 }],
+
+      // Transactions
+      // {id, date, type(in/out/transfer), amountBRL, currency, amountOriginal, fxUsed, fxMonth,
+      //  desc, subcatId, payMethod, cardId?, accountId?, fromId?, toId?, notes, meta:{}}
+      tx: [],
+
+      // UI
+      filters: { start:null, end:null, type:"all", subcat:"all", pay:"all", search:"" },
+      sort: { key:"date", dir:"desc" },
+      expandedGroupId: null
+    };
+
+    // ===== STORAGE =====
+    function load(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      try{
+        const data = JSON.parse(raw);
+        Object.assign(state, data);
+
+        // sane defaults
+        if(!state.groups?.length) state.groups = [
+          { id:"fixed", name:"Despesas fixas", pct:50, enabled:true },
+          { id:"variable", name:"Despesas variáveis", pct:30, enabled:true },
+          { id:"invest", name:"Investimentos", pct:20, enabled:true },
+        ];
+        if(!state.subcats?.length) throw new Error("bad subcats");
+        if(!state.accounts?.length) state.accounts = [{ id:"acc_main", name:"Principal", opening:0 }];
+        if(!state.cards) state.cards = [];
+        if(!state.fxByMonth) state.fxByMonth = {};
+        if(!state.budgetMonth) state.budgetMonth = nowMonthKey();
+        if(!state.filters) state.filters = { start:null, end:null, type:"all", subcat:"all", pay:"all", search:"" };
+        if(!state.sort) state.sort = { key:"date", dir:"desc" };
+        if(state.expandedGroupId === undefined) state.expandedGroupId = null;
+      }catch(e){
+        // ignore corrupted
+      }
+    }
+
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSaveStatus("salvo");
+    }
+
+    // ===== FX =====
+    function getFx(mk){
+      const v = state.fxByMonth?.[mk]?.usdbrl;
+      return v ? Number(v) : null;
+    }
+
+    async function ensureFx(mk, force=false){
+      const ex = state.fxByMonth[mk];
+      const fresh = ex && (Date.now() - Number(ex.fetchedAt||0) < 1000*60*60*24*7);
+      if(ex && fresh && !force) return;
+
+      try{
+        const { rate, source } = await fetchUsdBrl();
+        state.fxByMonth[mk] = { usdbrl: rate, fetchedAt: Date.now(), source };
+        save();
+      }catch(e){
+        // offline -> ignore
+      }
+    }
+
+    function setFxManual(mk, rate){
+      const r = Number(rate);
+      if(!(r>0)) return false;
+      state.fxByMonth[mk] = { usdbrl: r, fetchedAt: Date.now(), source:"manual" };
+      save();
+      return true;
+    }
+
+    function convertToBRL(amount, currency, dateISO){
+      const amt = Number(amount||0);
+      if(currency === "BRL") return { brl: amt, fxUsed:null, fxMonth:null };
+
+      const mk = monthKeyFromISO(dateISO) || state.budgetMonth || nowMonthKey();
+      const rate = getFx(mk) || getFx(nowMonthKey());
+      if(!rate) return { brl: amt, fxUsed:null, fxMonth:mk };
+
+      return { brl: Number((amt * rate).toFixed(2)), fxUsed: rate, fxMonth: mk };
+    }
+
+    function fixedSalaryBRL(mk){
+      const rate = getFx(mk);
+      if(!rate) return 0;
+      return Number((Number(state.fixedSalaryUSD||0) * rate).toFixed(2));
+    }
+
+    // ===== GROUP/SUBCAT HELPERS =====
+    function getGroup(id){ return state.groups.find(g=>g.id===id) || null; }
+    function getSubcat(id){ return state.subcats.find(s=>s.id===id) || null; }
+
+    function listExpenseSubcats(){
+      return state.subcats.filter(s=>s.type==="expense").slice().sort((a,b)=>a.name.localeCompare(b.name));
+    }
+    function listIncomeSubcats(){
+      return state.subcats.filter(s=>s.type==="income").slice().sort((a,b)=>a.name.localeCompare(b.name));
+    }
+
+    // ===== MONTH RANGE (calendário) =====
+    function monthRange(mk){
+      const [yS,mS] = (mk||nowMonthKey()).split("-");
+      const y = Number(yS), m = Number(mS);
+      const start = new Date(y, m-1, 1);
+      const end = new Date(y, m, 0, 23,59,59,999);
+      return { start, end };
+    }
+
+    // ===== AGGREGATES =====
+    function sumIncomeMonth(mk){
+      const { start, end } = monthRange(mk);
+      let sum = 0;
+      for(const t of state.tx){
+        if(t.type !== "in") continue;
+        const dt = parseDateISO(t.date);
+        if(!dt || dt < start || dt > end) continue;
+        sum += Number(t.amountBRL||0);
+      }
+      return sum;
+    }
+
+    function sumSpentByGroupMonth(mk){
+      const { start, end } = monthRange(mk);
+      const out = {};
+      for(const g of state.groups) out[g.id] = 0;
+
+      for(const t of state.tx){
+        if(t.type !== "out") continue;
+        if(t.meta?.isCardPayment) continue;          // pagamento de fatura não entra
+        const dt = parseDateISO(t.date);
+        if(!dt || dt < start || dt > end) continue;
+
+        const sub = getSubcat(t.subcatId);
+        if(!sub || sub.type!=="expense") continue;
+        if(!sub.include) continue;
+
+        const gid = sub.groupId;
+        if(!gid) continue;
+        out[gid] = (out[gid]||0) + Number(t.amountBRL||0);
+      }
+      return out;
+    }
+
+    function sumSpentBySubcatMonth(mk, groupId){
+      const { start, end } = monthRange(mk);
+      const out = {};
+      for(const s of state.subcats){
+        if(s.type==="expense" && s.groupId===groupId) out[s.id] = 0;
+      }
+
+      for(const t of state.tx){
+        if(t.type !== "out") continue;
+        if(t.meta?.isCardPayment) continue;
+        const dt = parseDateISO(t.date);
+        if(!dt || dt < start || dt > end) continue;
+
+        const sub = getSubcat(t.subcatId);
+        if(!sub || sub.type!=="expense") continue;
+        if(!sub.include) continue;
+        if(sub.groupId !== groupId) continue;
+
+        out[sub.id] = (out[sub.id]||0) + Number(t.amountBRL||0);
+      }
+      return out;
+    }
+
+    function cardSpendMonth(mk, cardId=null){
+      const { start, end } = monthRange(mk);
+      let sum = 0;
+      for(const t of state.tx){
+        if(t.type !== "out") continue;
+        if(t.meta?.isCardPayment) continue; // não conta pagamento
+        const dt = parseDateISO(t.date);
+        if(!dt || dt < start || dt > end) continue;
+        if(t.payMethod !== "Cartão") continue;
+        if(cardId && t.cardId !== cardId) continue;
+        sum += Number(t.amountBRL||0);
+      }
+      return sum;
+    }
+
+    // ===== BALANCE =====
+    function computeBalancesAsOf(dateObj, includePlanned=true){
+      // Não existe planned nesse modelo final (simplificado).
+      // Card purchases não mexem no saldo; card payments mexem.
+      const balances = new Map(state.accounts.map(a=>[a.id, Number(a.opening||0)]));
+      const end = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 23,59,59,999);
+
+      const sorted = state.tx.slice().sort((a,b)=>{
+        const da = parseDateISO(a.date)?.getTime()||0;
+        const db = parseDateISO(b.date)?.getTime()||0;
+        if(da!==db) return da-db;
+        return (Number(a.createdAt||0)-Number(b.createdAt||0));
+      });
+
+      for(const t of sorted){
+        const dt = parseDateISO(t.date);
+        if(!dt || dt > end) continue;
+
+        const amt = Number(t.amountBRL||0);
+        if(!(amt>0)) continue;
+
+        if(t.type==="in"){
+          balances.set(t.accountId, (balances.get(t.accountId)||0) + amt);
+        }else if(t.type==="out"){
+          // compra no cartão não mexe
+          if(t.payMethod === "Cartão" && !t.meta?.isCardPayment){
+            continue;
+          }
+          // pagamento de fatura ou outras saídas da conta mexem
+          balances.set(t.accountId, (balances.get(t.accountId)||0) - amt);
+        }else if(t.type==="transfer"){
+          balances.set(t.fromId, (balances.get(t.fromId)||0) - amt);
+          balances.set(t.toId, (balances.get(t.toId)||0) + amt);
+        }
+      }
+
+      let total=0;
+      for(const v of balances.values()) total += v;
+      return { balances, total };
+    }
+
+    // ===== UI FILL =====
+    function fillFilters(){
+      // month
+      el("budgetMonth").value = state.budgetMonth || nowMonthKey();
+
+      // subcat filter
+      const f = el("fSubcat");
+      f.innerHTML = "";
+      const oAll = document.createElement("option");
+      oAll.value = "all"; oAll.textContent = "Todas";
+      f.appendChild(oAll);
+      for(const s of state.subcats.slice().sort((a,b)=>a.name.localeCompare(b.name))){
+        const o = document.createElement("option");
+        o.value = s.id;
+        o.textContent = `${s.type==="income"?"(Receita) ":""}${s.name}`;
+        f.appendChild(o);
+      }
+      f.value = state.filters.subcat || "all";
+
+      el("fType").value = state.filters.type || "all";
+      el("fPay").value = state.filters.pay || "all";
+      el("fSearch").value = state.filters.search || "";
+      el("fStart").value = state.filters.start || "";
+      el("fEnd").value = state.filters.end || "";
+
+      // fx config
+      el("fixedUSD").value = String(Number(state.fixedSalaryUSD||0));
+      el("fxMonthPick").value = state.budgetMonth || nowMonthKey();
+      const fx = state.fxByMonth?.[state.budgetMonth];
+      el("fxManual").value = fx?.usdbrl ? String(Number(fx.usdbrl)) : "";
+
+      // newSubGroup options
+      const gsel = el("newSubGroup");
+      gsel.innerHTML = "";
+      for(const g of state.groups){
+        const o = document.createElement("option");
+        o.value = g.id; o.textContent = g.name;
+        gsel.appendChild(o);
+      }
+    }
+
+    function fillModalSelects(){
+      // accounts
+      const accSel = el("mAccount");
+      const fromSel = el("mFrom");
+      const toSel = el("mTo");
+      accSel.innerHTML = ""; fromSel.innerHTML=""; toSel.innerHTML="";
+      for(const a of state.accounts){
+        const o1=document.createElement("option"); o1.value=a.id; o1.textContent=a.name; accSel.appendChild(o1);
+        const o2=document.createElement("option"); o2.value=a.id; o2.textContent=a.name; fromSel.appendChild(o2);
+        const o3=document.createElement("option"); o3.value=a.id; o3.textContent=a.name; toSel.appendChild(o3);
+      }
+
+      // cards
+      const csel = el("mCard");
+      csel.innerHTML = "";
+      for(const c of state.cards){
+        const o=document.createElement("option"); o.value=c.id; o.textContent=c.name; csel.appendChild(o);
+      }
+
+      // subcats (depends on type)
+      fillModalSubcats();
+    }
+
+    function fillModalSubcats(){
+      const type = el("mType").value;
+      const sel = el("mSubcat");
+      const prev = sel.value; // preserva seleção atual
+      sel.innerHTML = "";
+
+      const list = (type==="in") ? listIncomeSubcats() : listExpenseSubcats();
+      for(const s of list){
+        // esconde categoria sistema de pagamento fatura no modal normal
+        if(s.id==="sys_ccpay") continue;
+        const o=document.createElement("option");
+        o.value=s.id;
+        o.textContent = s.name;
+        sel.appendChild(o);
+      }
+
+      // restaura seleção se ainda existir
+      if(prev && Array.from(sel.options).some(o=>o.value===prev)){
+        sel.value = prev;
+      }
+    }
+
+    function updateModalVisibility(){
+      const type = el("mType").value;
+      const isTransfer = type==="transfer";
+      const isOut = type==="out";
+      const isIn = type==="in";
+
+      el("wrapPay").style.display = isTransfer ? "none" : "block";
+      el("wrapAccountPick").style.display = (isTransfer ? "none" : "block");
+      el("wrapFrom").style.display = isTransfer ? "block" : "none";
+      el("wrapTo").style.display = isTransfer ? "block" : "none";
+
+      // Para entrada: pagamento não importa
+      if(isIn){
+        el("wrapPay").style.display = "none";
+        el("wrapCardPick").style.display = "none";
+      }
+
+      // Para saída: se pagamento = Cartão, pede qual cartão e não pede conta (não mexe saldo)
+      const pay = el("mPay").value;
+      if(isOut && pay==="Cartão"){
+        el("wrapCardPick").style.display = "block";
+        el("wrapAccountPick").style.display = "none";
+      }else{
+        el("wrapCardPick").style.display = "none";
+        if(!isTransfer && !isIn) el("wrapAccountPick").style.display = "block";
+      }
+
+      // Subcats por tipo
+      fillModalSubcats();
+
+      updateModalFxPreview();
+    }
+
+    function updateModalFxPreview(){
+      const dateISO = el("mDate").value || toISODate(new Date());
+      const currency = el("mCurrency").value || "BRL";
+      const amt = Number(el("mAmount").value || 0);
+
+      const conv = convertToBRL(amt, currency, dateISO);
+      el("mAmountBRL").value = money(conv.brl);
+
+      if(currency==="USD"){
+        const mk = monthKeyFromISO(dateISO);
+        const rate = getFx(mk);
+        el("modalHint").textContent = rate
+          ? `USD→BRL usando taxa do mês ${mk}: ${rate.toFixed(4)}`
+          : `USD→BRL: taxa do mês ${mk} ainda não está salva (use “Atualizar cotação agora” ou salve manual).`;
+      }else{
+        el("modalHint").textContent = "BRL: valor será usado diretamente.";
+      }
+    }
+
+    // ===== RENDER =====
+    function barColor(spent, stableLimit, flexLimit){
+      if(!isFinite(flexLimit) || flexLimit<=0) return "rgba(255,255,255,.22)";
+      if(spent <= stableLimit) return "linear-gradient(90deg, var(--ok), rgba(52,211,153,.65))";
+      if(spent <= flexLimit) return "linear-gradient(90deg, var(--warn), rgba(251,191,36,.65))";
+      return "linear-gradient(90deg, var(--danger), rgba(251,113,133,.65))";
+    }
+
+    function renderSide(){
+      const mk = state.budgetMonth;
+      el("sideMonth").textContent = mk;
+
+      const fx = state.fxByMonth?.[mk];
+      el("sideFx").textContent = fx?.usdbrl ? fx.usdbrl.toFixed(4) : "—";
+
+      const fixedBRL = fixedSalaryBRL(mk);
+      el("sideFixedBRL").textContent = fixedBRL ? money(fixedBRL) : "—";
+    }
+
+    function renderFxNote(){
+      const mk = state.budgetMonth;
+      const fx = state.fxByMonth?.[mk];
+      if(fx?.usdbrl){
+        const dt = new Date(Number(fx.fetchedAt||0));
+        const when = isFinite(dt.getTime()) ? dt.toLocaleString("pt-BR") : "—";
+        el("fxNote").innerHTML = `Cotação do mês <b>${mk}</b>: <b>${fx.usdbrl.toFixed(4)}</b> (${fx.source}) • atualizada em ${when}`;
+        el("fxConfigHint").textContent = `Cotação atual do mês ${mk}: ${fx.usdbrl.toFixed(4)} (${fx.source})`;
+      }else{
+        el("fxNote").innerHTML = `Cotação do mês <b>${mk}</b>: <b>não encontrada</b> (use “Atualizar cotação agora” ou salve manual)`;
+        el("fxConfigHint").textContent = `Sem cotação salva para ${mk}. Use atualização automática ou manual.`;
+      }
+    }
+
+    function renderChips(){
+      const today = new Date();
+      const real = computeBalancesAsOf(today, true).total;
+      const proj = computeBalancesAsOf(new Date(today.getFullYear(), today.getMonth(), today.getDate()+90), true).total;
+
+      el("chipReal").textContent = money(real);
+      el("chipProj").textContent = money(proj);
+      el("sideReal").textContent = money(real);
+      el("sideProj").textContent = money(proj);
+
+      el("chipCardMonth").textContent = money(cardSpendMonth(state.budgetMonth));
+      // espelha no card do Dashboard (se existir)
+      const dr = document.getElementById("dashReal");
+      const dp = document.getElementById("dashProj");
+      const dc = document.getElementById("dashCard");
+      if(dr) dr.textContent = el("chipReal").textContent;
+      if(dp) dp.textContent = el("chipProj").textContent;
+      if(dc) dc.textContent = el("chipCardMonth").textContent;
+
+    }
+
+    function renderMonthSummary(){
+      const mk = state.budgetMonth;
+      const income = sumIncomeMonth(mk);
+      const fixedBRL = fixedSalaryBRL(mk);
+      const stableBase = Math.min(income, fixedBRL || income);
+
+      el("monthSummary").textContent = `Renda mês: ${money(income)} • Base estável: ${money(stableBase)} • Fixo (cap): ${money(fixedBRL)}`;
+    }
+
+    function renderGroups(){
+      const mk = state.budgetMonth;
+      const income = sumIncomeMonth(mk);
+      const fixedBRL = fixedSalaryBRL(mk);
+      const stableBase = Math.min(income, fixedBRL || income);
+
+      const spentByGroup = sumSpentByGroupMonth(mk);
+
+      const wrap = el("groupsContainer");
+      wrap.innerHTML = "";
+
+      for(const g of state.groups){
+        const spent = Number(spentByGroup[g.id]||0);
+        const pct = Number(g.pct||0)/100;
+
+        const stableLimit = stableBase * pct;
+        const flexLimit = income * pct;
+
+        const stablePos = (flexLimit>0) ? clamp((stableLimit/flexLimit)*100, 0, 100) : 0;
+        const fill = (flexLimit>0) ? clamp((spent/flexLimit)*100, 0, 100) : 0;
+        const color = barColor(spent, stableLimit, flexLimit);
+
+        const over = (flexLimit>0 && spent>flexLimit) ? ` • excedeu ${money(spent-flexLimit)}` : "";
+
+        const div = document.createElement("div");
+        div.className = "group-card";
+        div.dataset.group = g.id;
+        div.innerHTML = `
+          <div class="group-top">
+            <strong>${g.name}</strong>
+            <span>${money(spent)} / ${money(flexLimit)}${over}</span>
+          </div>
+          <div class="group-sub">
+            <span>Estável: ${money(stableLimit)} • Flexível: ${money(flexLimit)} • %: ${Number(g.pct||0).toFixed(1)}%</span>
+            <span class="muted">${state.expandedGroupId===g.id ? "Clique para fechar" : "Clique para detalhes"}</span>
+          </div>
+
+          <div class="bar-wrap">
+            <div class="marker" style="left:${stablePos}%;">
+              <div class="label">Estável<br>${money(stableLimit)}</div>
+              <div class="tri"></div>
+            </div>
+            <div class="marker" style="left:100%;">
+              <div class="label">Flexível<br>${money(flexLimit)}</div>
+              <div class="tri"></div>
+            </div>
+
+            <div class="bar">
+              <i style="width:${fill}%; background:${color};"></i>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(div);
+      }
+
+      // click handlers
+      $$(".group-card", wrap).forEach(card=>{
+        card.addEventListener("click", ()=>{
+          const gid = card.dataset.group;
+          state.expandedGroupId = (state.expandedGroupId===gid) ? null : gid;
+          save();
+          renderGroupDetails();
+          renderGroups(); // update hint
+        });
+      });
+    }
+
+    function renderGroupDetails(){
+      const mount = el("groupDetailsMount");
+      mount.innerHTML = "";
+      const gid = state.expandedGroupId;
+      if(!gid) return;
+
+      const g = getGroup(gid);
+      if(!g) return;
+
+      const mk = state.budgetMonth;
+      const spentBySub = sumSpentBySubcatMonth(mk, gid);
+
+      // order by amount desc
+      const rows = Object.entries(spentBySub)
+        .map(([sid, amt])=>({ sid, amt }))
+        .sort((a,b)=>b.amt-a.amt);
+
+      const box = document.createElement("div");
+      box.className = "details";
+      box.innerHTML = `<h4>Detalhamento • ${g.name} • ${mk}</h4>`;
+
+      let total = 0;
+      for(const r of rows){
+        const sub = getSubcat(r.sid);
+        if(!sub) continue;
+        if(!sub.include) continue;
+        total += r.amt;
+
+        const div = document.createElement("div");
+        div.className = "subrow";
+        div.innerHTML = `
+          <div>
+            <strong>${sub.name}</strong>
+            ${sub.include ? "" : `<span class="tag">fora dos limites</span>`}
+          </div>
+          <div><strong>${money(r.amt)}</strong></div>
+        `;
+        box.appendChild(div);
+      }
+
+      const footer = document.createElement("div");
+      footer.className = "subrow";
+      footer.style.marginTop = "10px";
+      footer.innerHTML = `<div><strong>Total do grupo</strong></div><div><strong>${money(total)}</strong></div>`;
+      box.appendChild(footer);
+
+      mount.appendChild(box);
+    }
+
+    function applyFiltersFromUI(){
+      state.budgetMonth = el("budgetMonth").value || nowMonthKey();
+      state.filters.start = el("fStart").value || null;
+      state.filters.end = el("fEnd").value || null;
+      state.filters.type = el("fType").value || "all";
+      state.filters.subcat = el("fSubcat").value || "all";
+      state.filters.pay = el("fPay").value || "all";
+      state.filters.search = el("fSearch").value || "";
+    }
+
+    function txMatchesFilters(t){
+      const f = state.filters;
+
+      if(f.type !== "all" && t.type !== f.type) return false;
+      if(f.subcat !== "all" && t.subcatId !== f.subcat) return false;
+      if(f.pay !== "all" && (t.payMethod || "") !== f.pay) return false;
+
+      const dt = parseDateISO(t.date);
+      if(f.start){
+        const s = parseDateISO(f.start);
+        if(dt && s && dt < s) return false;
+      }
+      if(f.end){
+        const e = parseDateISO(f.end);
+        if(dt && e){
+          const e2 = new Date(e.getFullYear(), e.getMonth(), e.getDate(), 23,59,59,999);
+          if(dt > e2) return false;
+        }
+      }
+
+      const q = (f.search||"").trim().toLowerCase();
+      if(q){
+        const sub = getSubcat(t.subcatId)?.name || "";
+        const grp = getGroup(getSubcat(t.subcatId)?.groupId || "")?.name || "";
+        const hay = [t.desc, sub, grp, t.payMethod, t.notes].join(" ").toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+
+      return true;
+    }
+
+    function computeLedgerBalanceMap(){
+      const balances = new Map(state.accounts.map(a=>[a.id, Number(a.opening||0)]));
+
+      const sorted = state.tx.slice().sort((a,b)=>{
+        const da = parseDateISO(a.date)?.getTime()||0;
+        const db = parseDateISO(b.date)?.getTime()||0;
+        if(da!==db) return da-db;
+        return (Number(a.createdAt||0)-Number(b.createdAt||0));
+      });
+
+      const map = new Map();
+
+      for(const t of sorted){
+        const amt = Number(t.amountBRL||0);
+        if(!(amt>0)) { map.set(t.id, null); continue; }
+
+        if(t.type==="in"){
+          balances.set(t.accountId, (balances.get(t.accountId)||0) + amt);
+        }else if(t.type==="out"){
+          if(t.payMethod==="Cartão" && !t.meta?.isCardPayment){
+            // compra no cartão não mexe saldo
+          }else{
+            balances.set(t.accountId, (balances.get(t.accountId)||0) - amt);
+          }
+        }else if(t.type==="transfer"){
+          balances.set(t.fromId, (balances.get(t.fromId)||0) - amt);
+          balances.set(t.toId, (balances.get(t.toId)||0) + amt);
+        }
+
+        let total=0;
+        for(const v of balances.values()) total += v;
+        map.set(t.id, total);
+      }
+
+      return map;
+    }
+
+    function renderTransactions(){
+      const list = state.tx.filter(txMatchesFilters);
+
+      // sums
+      let ins=0, outs=0;
+      for(const t of list){
+        if(t.type==="in") ins += Number(t.amountBRL||0);
+        if(t.type==="out" && !(t.meta?.isCardPayment)) outs += Number(t.amountBRL||0);
+        // pagamento de fatura não entra como gasto (mas mexe no saldo)
+      }
+      el("sumIn").textContent = money(ins);
+      el("sumOut").textContent = money(outs);
+      el("sumNet").textContent = money(ins - outs);
+
+      const ledger = computeLedgerBalanceMap();
+      list.forEach(t=> t._bal = ledger.get(t.id));
+
+      // sort
+      const { key, dir } = state.sort;
+      const mult = dir==="asc" ? 1 : -1;
+
+      const sorted = list.slice().sort((a,b)=>{
+        if(key==="date"){
+          const da = parseDateISO(a.date)?.getTime()||0;
+          const db = parseDateISO(b.date)?.getTime()||0;
+          if(da!==db) return (da-db)*mult;
+
+          // ✅ desempate por ordem de criação (mesma data):
+          // quando ordenação é DESC (date ↓), o mais recente fica no topo.
+          const ca = Number(a.createdAt||0);
+          const cb = Number(b.createdAt||0);
+          return (ca-cb)*mult;
+        }
+        if(key==="amount") return (Number(a.amountBRL||0)-Number(b.amountBRL||0))*mult;
+        const ta = (a[key]??"").toString().toLowerCase();
+        const tb = (b[key]??"").toString().toLowerCase();
+        return (ta>tb?1:-1)*mult;
+      });
+
+      const tbody = el("txBody");
+      tbody.innerHTML = "";
+      if(!sorted.length){
+        const tr=document.createElement("tr");
+        tr.innerHTML = `<td colspan="9" class="muted">Nenhum lançamento.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for(const t of sorted){
+        const sub = getSubcat(t.subcatId);
+        const group = sub?.groupId ? getGroup(sub.groupId) : null;
+
+        const typeLabel = t.type==="in" ? "Entrada" : (t.type==="out" ? "Saída" : "Transfer.");
+        const amtClass = t.type==="in" ? "amt-in" : (t.type==="out" ? "amt-out" : "amt-xfer");
+        const sign = t.type==="in" ? "+" : (t.type==="out" ? "-" : "↔");
+
+        const fxLine = (t.currency==="USD")
+          ? `<div class="muted" style="font-size:12px; margin-top:4px;">USD ${Number(t.amountOriginal||0).toFixed(2)} • taxa ${t.fxUsed ? t.fxUsed.toFixed(4) : "—"} • mês ${t.fxMonth||"—"}</div>`
+          : "";
+
+        const payTag = (t.meta?.isCardPayment)
+          ? `Pagamento fatura`
+          : (t.payMethod || "—");
+
+        const balDisp = (t.type==="out" && t.payMethod==="Cartão" && !t.meta?.isCardPayment)
+          ? `<span class="muted">—</span>`
+          : (t._bal==null ? `<span class="muted">—</span>` : money(t._bal));
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(t.date).toLocaleDateString("pt-BR")}</td>
+          <td><span class="tag">${typeLabel}</span></td>
+          <td>${(t.desc||"")}${fxLine}</td>
+          <td>${group ? `<span class="tag">${group.name}</span>` : `<span class="muted">—</span>`}</td>
+          <td>${sub ? `<span class="tag">${sub.name}</span>` : `<span class="muted">—</span>`}</td>
+          <td><span class="tag">${payTag}</span></td>
+          <td class="right ${amtClass}">${sign} ${money(t.amountBRL)}</td>
+          <td class="right">${balDisp}</td>
+          <td class="nowrap">
+            <button class="btn" data-edit="${t.id}">Editar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      el("txCount").textContent = `${sorted.length} lançamento(s)`;
+      el("sortInfo").textContent = `Ordenação: ${key} ${dir==="asc"?"↑":"↓"}`;
+
+      $$("button[data-edit]", tbody).forEach(b=>{
+        b.addEventListener("click", ()=> openEdit(b.getAttribute("data-edit")));
+      });
+    }
+
+    function renderAdminGroups(){
+      const tbody = el("groupsAdminBody");
+      tbody.innerHTML = "";
+
+      for(const g of state.groups){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${g.name}</strong></td>
+          <td class="right"><input class="input" style="width:120px" type="number" step="0.1" min="0" max="100" value="${Number(g.pct||0)}" data-gpct="${g.id}" /></td>
+          <td>
+            <label class="tag" style="cursor:pointer;">
+              <input type="checkbox" ${g.enabled ? "checked":""} data-genabled="${g.id}" />
+              Ativo
+            </label>
+          </td>
+          <td class="nowrap">
+            <button class="btn" data-grename="${g.id}">Renomear</button>
+            <button class="btn danger" data-gdel="${g.id}">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      $$("input[data-gpct]", tbody).forEach(inp=>{
+        inp.addEventListener("input", ()=>{
+          const id = inp.getAttribute("data-gpct");
+          const g = getGroup(id);
+          if(!g) return;
+          g.pct = clamp(Number(inp.value||0), 0, 100);
+          save();
+          renderAll();
+        });
+      });
+
+      $$("input[data-genabled]", tbody).forEach(inp=>{
+        inp.addEventListener("change", ()=>{
+          const id = inp.getAttribute("data-genabled");
+          const g = getGroup(id);
+          if(!g) return;
+          g.enabled = inp.checked;
+          save();
+          renderAll();
+        });
+      });
+
+      $$("button[data-grename]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-grename");
+          const g = getGroup(id);
+          if(!g) return;
+          const name = prompt("Novo nome do grupo:", g.name);
+          if(!name) return;
+          g.name = name.trim();
+          save();
+          renderAll();
+        });
+      });
+
+      $$("button[data-gdel]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-gdel");
+          const used = state.subcats.some(s=>s.groupId===id);
+          if(used){
+            alert("Não dá para excluir: há subcategorias usando este grupo.");
+            return;
+          }
+          if(state.groups.length<=1){
+            alert("Você precisa ter pelo menos 1 grupo.");
+            return;
+          }
+          state.groups = state.groups.filter(g=>g.id!==id);
+          save();
+          renderAll();
+        });
+      });
+
+      // refresh dropdown for newSubGroup
+      const gsel = el("newSubGroup");
+      gsel.innerHTML = "";
+      for(const g of state.groups){
+        const o=document.createElement("option");
+        o.value=g.id; o.textContent=g.name;
+        gsel.appendChild(o);
+      }
+    }
+
+    function renderAdminSubcats(){
+      const tbody = el("subcatsAdminBody");
+      tbody.innerHTML = "";
+
+      const groupsMap = new Map(state.groups.map(g=>[g.id,g.name]));
+
+      const sorted = state.subcats.slice().sort((a,b)=>{
+        const ta = `${a.type}_${a.name}`.toLowerCase();
+        const tb = `${b.type}_${b.name}`.toLowerCase();
+        return ta.localeCompare(tb);
+      });
+
+      for(const s of sorted){
+        const tr = document.createElement("tr");
+
+        const groupSelect = (s.type==="expense")
+          ? `<select class="input" style="width:220px" data-sgroup="${s.id}">
+              ${state.groups.map(g=>`<option value="${g.id}" ${g.id===s.groupId?"selected":""}>${g.name}</option>`).join("")}
+            </select>`
+          : `<span class="muted">—</span>`;
+
+        tr.innerHTML = `
+          <td><strong>${s.name}</strong></td>
+          <td><span class="tag">${s.type==="expense" ? "Despesa" : "Receita"}</span></td>
+          <td>${groupSelect}</td>
+          <td>
+            <label class="tag" style="cursor:pointer;">
+              <input type="checkbox" ${s.include ? "checked":""} data-sinc="${s.id}" />
+              Sim
+            </label>
+          </td>
+          <td class="nowrap">
+            <button class="btn" data-srename="${s.id}">Renomear</button>
+            <button class="btn danger" data-sdel="${s.id}">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      $$("select[data-sgroup]", tbody).forEach(sel=>{
+        sel.addEventListener("change", ()=>{
+          const id = sel.getAttribute("data-sgroup");
+          const s = getSubcat(id);
+          if(!s) return;
+          s.groupId = sel.value;
+          save();
+          renderAll();
+        });
+      });
+
+      $$("input[data-sinc]", tbody).forEach(inp=>{
+        inp.addEventListener("change", ()=>{
+          const id = inp.getAttribute("data-sinc");
+          const s = getSubcat(id);
+          if(!s) return;
+          s.include = inp.checked;
+          save();
+          renderAll();
+        });
+      });
+
+      $$("button[data-srename]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-srename");
+          const s = getSubcat(id);
+          if(!s) return;
+          const name = prompt("Novo nome da subcategoria:", s.name);
+          if(!name) return;
+          s.name = name.trim();
+          save();
+          renderAll();
+        });
+      });
+
+      $$("button[data-sdel]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-sdel");
+          if(id==="sys_ccpay"){
+            alert("Subcategoria do sistema não pode ser removida.");
+            return;
+          }
+          const used = state.tx.some(t=>t.subcatId===id);
+          if(used){
+            alert("Não dá para excluir: há lançamentos usando essa subcategoria.");
+            return;
+          }
+          state.subcats = state.subcats.filter(s=>s.id!==id);
+          save();
+          renderAll();
+        });
+      });
+    }
+
+    function renderAccounts(){
+      const today = new Date();
+      const snapNow = computeBalancesAsOf(today, true);
+      const snap90 = computeBalancesAsOf(new Date(today.getFullYear(), today.getMonth(), today.getDate()+90), true);
+
+      const tbody = el("accountsBody");
+      tbody.innerHTML = "";
+
+      for(const a of state.accounts){
+        const tr=document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${a.name}</strong></td>
+          <td class="right">${money(a.opening||0)}</td>
+          <td class="right">${money(snapNow.balances.get(a.id)||0)}</td>
+          <td class="right">${money(snap90.balances.get(a.id)||0)}</td>
+          <td class="nowrap">
+            <button class="btn danger" data-adel="${a.id}">Remover</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      $$("button[data-adel]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-adel");
+          if(state.accounts.length<=1){
+            alert("Você precisa ter pelo menos 1 conta.");
+            return;
+          }
+          const used = state.tx.some(t=>t.accountId===id || t.fromId===id || t.toId===id);
+          if(used){
+            alert("Não dá para remover: há lançamentos usando esta conta.");
+            return;
+          }
+          state.accounts = state.accounts.filter(a=>a.id!==id);
+          save();
+          renderAll();
+        });
+      });
+    }
+
+    function renderCards(){
+      const mk = state.budgetMonth;
+      const tbody = el("cardsBody");
+      tbody.innerHTML = "";
+
+      if(!state.cards.length){
+        const tr=document.createElement("tr");
+        tr.innerHTML = `<td colspan="5" class="muted">Nenhum cartão.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      for(const c of state.cards){
+        const spent = cardSpendMonth(mk, c.id);
+        const avail = Number(c.limit||0) - spent;
+
+        const tr=document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${c.name}</strong></td>
+          <td class="right">${money(c.limit||0)}</td>
+          <td class="right">${money(spent)}</td>
+          <td class="right">${money(avail)}</td>
+          <td class="nowrap">
+            <button class="btn danger" data-cdel="${c.id}">Remover</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      $$("button[data-cdel]", tbody).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-cdel");
+          const used = state.tx.some(t=>t.cardId===id);
+          if(used){
+            alert("Não dá para remover: há lançamentos usando este cartão.");
+            return;
+          }
+          state.cards = state.cards.filter(c=>c.id!==id);
+          save();
+          renderAll();
+        });
+      });
+    }
+
+    
+    // ===== DASHBOARD CHARTS (Chart.js) =====
+    let chartCashflow = null;
+    let chartCategories = null;
+    let chartProjection = null;
+    let chartAccounts = null;
+
+    function getCssVar(name){
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function last12MonthKeys(){
+      const now = new Date();
+      const out = [];
+      for(let i=11;i>=0;i--){
+        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+        const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+        out.push(mk);
+      }
+      return out;
+    }
+
+    function monthLabel(mk){
+      const [y,m] = mk.split("-");
+      const d = new Date(Number(y), Number(m)-1, 1);
+      const mm = d.toLocaleDateString("pt-BR", { month:"short" }).replace(".","");
+      return `${mm}/${y}`;
+    }
+
+    function monthlyCashflowSeries(){
+      const months = last12MonthKeys();
+      const map = Object.fromEntries(months.map(m=>[m,{inc:0,out:0}]));
+
+      for(const t of state.tx){
+        const mk = monthKeyFromISO(t.date);
+        if(!(mk in map)) continue;
+
+        const amt = Number(t.amountBRL||0);
+        if(!(amt>0)) continue;
+
+        if(t.type==="in"){
+          map[mk].inc += amt;
+        }else if(t.type==="out"){
+          // saída só entra no "caixa" se afeta saldo (não conta compra no cartão)
+          const affectsCash = (t.payMethod !== "Cartão") || (t.meta?.isCardPayment);
+          if(affectsCash) map[mk].out += amt;
+        }
+      }
+
+      return {
+        labels: months.map(monthLabel),
+        ins: months.map(m=>map[m].inc),
+        outs: months.map(m=>map[m].out)
+      };
+    }
+
+    function spendingBySubcat(){
+      const mk = state.budgetMonth || nowMonthKey();
+      const { start, end } = monthRange(mk);
+
+      const agg = new Map(); // name -> sum
+      for(const t of state.tx){
+        if(t.type!=="out") continue;
+        if(t.meta?.isCardPayment) continue; // pagamento fatura não é gasto
+        const dt = parseDateISO(t.date);
+        if(!dt || dt<start || dt>end) continue;
+
+        const sub = getSubcat(t.subcatId);
+        const name = sub?.name || "—";
+        agg.set(name, (agg.get(name)||0) + Number(t.amountBRL||0));
+      }
+
+      const items = Array.from(agg.entries()).sort((a,b)=>b[1]-a[1]);
+      const top = items.slice(0,8);
+      const rest = items.slice(8);
+      if(rest.length){
+        const restSum = rest.reduce((s,[_,v])=>s+v,0);
+        top.push(["Outros", restSum]);
+      }
+      return { labels: top.map(x=>x[0]), values: top.map(x=>x[1]) };
+    }
+
+    function projection90(){
+      const today = new Date();
+      const days = 90;
+      const labels = [];
+      const values = [];
+      for(let d=0; d<=days; d++){
+        const cur = new Date(today.getFullYear(), today.getMonth(), today.getDate()+d);
+        labels.push(cur.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit" }));
+        values.push(computeBalancesAsOf(cur, true).total);
+      }
+      return { labels, values };
+    }
+
+    function balancesByAccountToday(){
+      const snap = computeBalancesAsOf(new Date(), true);
+      const labels = state.accounts.map(a=>a.name);
+      const values = state.accounts.map(a=>snap.balances.get(a.id)||0);
+      return { labels, values };
+    }
+
+    function renderCharts(){
+      // Cashflow
+      const c1 = document.getElementById("chartCashflow");
+      if(c1){
+        const s = monthlyCashflowSeries();
+        if(chartCashflow) chartCashflow.destroy();
+        chartCashflow = new Chart(c1, {
+          type:"bar",
+          data:{
+            labels: s.labels,
+            datasets:[
+              { label:"Entradas", data: s.ins, borderWidth:1 },
+              { label:"Saídas (caixa)", data: s.outs, borderWidth:1 }
+            ]
+          },
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+              legend:{ labels:{ color:getCssVar("--muted") } },
+              tooltip:{ callbacks:{ label:(ctx)=> `${ctx.dataset.label}: ${money(ctx.parsed.y)}` } }
+            },
+            scales:{
+              x:{ ticks:{ color:getCssVar("--muted") }, grid:{ color:"rgba(255,255,255,.06)" } },
+              y:{ ticks:{ color:getCssVar("--muted"), callback:(v)=> money(v) }, grid:{ color:"rgba(255,255,255,.06)" } }
+            }
+          }
+        });
+      }
+
+      // Categories
+      const c2 = document.getElementById("chartCategories");
+      if(c2){
+        const s = spendingBySubcat();
+        if(chartCategories) chartCategories.destroy();
+        chartCategories = new Chart(c2, {
+          type:"doughnut",
+          data:{ labels: s.labels, datasets:[{ data: s.values, borderWidth:1 }] },
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+              legend:{ position:"bottom", labels:{ color:getCssVar("--muted") } },
+              tooltip:{ callbacks:{ label:(ctx)=> `${ctx.label}: ${money(ctx.parsed)}` } }
+            }
+          }
+        });
+      }
+
+      // Projection
+      const c3 = document.getElementById("chartProjection");
+      if(c3){
+        const s = projection90();
+        if(chartProjection) chartProjection.destroy();
+        chartProjection = new Chart(c3, {
+          type:"line",
+          data:{ labels: s.labels, datasets:[{ label:"Saldo", data: s.values, borderWidth:2, pointRadius:0 }] },
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+              legend:{ labels:{ color:getCssVar("--muted") } },
+              tooltip:{ callbacks:{ label:(ctx)=> `Saldo: ${money(ctx.parsed.y)}` } }
+            },
+            scales:{
+              x:{ ticks:{ color:getCssVar("--muted"), maxTicksLimit:10 }, grid:{ color:"rgba(255,255,255,.06)" } },
+              y:{ ticks:{ color:getCssVar("--muted"), callback:(v)=> money(v) }, grid:{ color:"rgba(255,255,255,.06)" } }
+            }
+          }
+        });
+      }
+
+      // Accounts
+      const c4 = document.getElementById("chartAccounts");
+      if(c4){
+        const s = balancesByAccountToday();
+        if(chartAccounts) chartAccounts.destroy();
+        chartAccounts = new Chart(c4, {
+          type:"bar",
+          data:{ labels: s.labels, datasets:[{ label:"Saldo", data: s.values, borderWidth:1 }] },
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+              legend:{ display:false },
+              tooltip:{ callbacks:{ label:(ctx)=> `Saldo: ${money(ctx.parsed.y)}` } }
+            },
+            scales:{
+              x:{ ticks:{ color:getCssVar("--muted") }, grid:{ color:"rgba(255,255,255,.06)" } },
+              y:{ ticks:{ color:getCssVar("--muted"), callback:(v)=> money(v) }, grid:{ color:"rgba(255,255,255,.06)" } }
+            }
+          }
+        });
+      }
+    }
+
+
+// ===== MODAL ACTIONS =====
+    function openModal(mode, tx=null){
+      // garante selects populados antes de setar valores (evita "categoria aleatória")
+      fillModalSelects();
+
+      el("modal").classList.add("open");
+      el("btnDelete").style.display = mode==="edit" ? "inline-flex" : "none";
+      el("modalTitle").textContent = mode==="edit" ? "Editar lançamento" : "Novo lançamento";
+
+      if(mode==="edit" && tx){
+        state.editingId = tx.id;
+
+        el("mDate").value = tx.date;
+        el("mType").value = tx.type;
+
+        el("mCurrency").value = tx.currency || "BRL";
+        el("mAmount").value = String(tx.amountOriginal ?? tx.amountBRL ?? 0);
+
+        el("mDesc").value = tx.desc || "";
+        el("mSubcat").value = tx.subcatId || "";
+        el("mPay").value = tx.payMethod || "PIX";
+        el("mCard").value = tx.cardId || (state.cards[0]?.id || "");
+        el("mAccount").value = tx.accountId || (state.accounts[0]?.id || "");
+        el("mFrom").value = tx.fromId || (state.accounts[0]?.id || "");
+        el("mTo").value = tx.toId || (state.accounts[0]?.id || "");
+
+        el("mInstallments").value = String(tx.meta?.installment?.total || 1);
+        el("mInterest").value = tx.meta?.installment?.rate ? String((tx.meta.installment.rate*100).toFixed(2)) : "";
+        el("mNotes").value = tx.notes || "";
+      }else{
+        state.editingId = null;
+      }
+
+      // atualiza visibilidade e preserva subcategoria escolhida
+      const keepSub = el("mSubcat").value;
+      updateModalVisibility();
+      if(keepSub) el("mSubcat").value = keepSub;
+
+      // atualiza preview de conversão
+      updateModalFxPreview();
+    }
+
+    
+
+    function openEdit(id){
+      const tx = state.tx.find(t => t.id === id);
+      if(!tx){
+        alert("Lançamento não encontrado.");
+        return;
+      }
+      openModal("edit", tx);
+    }
+
+function closeModal(){
+      el("modal").classList.remove("open");
+      state.editingId = null;
+    }
+
+    function deleteTx(id){
+      const idx = state.tx.findIndex(t=>t.id===id);
+      if(idx<0) return;
+      state.tx.splice(idx,1);
+      save();
+      renderAll();
+      closeModal();
+    }
+
+    function upsertTx(){
+      const dateISO = el("mDate").value || toISODate(new Date());
+      const type = el("mType").value;
+      const currency = el("mCurrency").value || "BRL";
+      const amountInput = Number(el("mAmount").value || 0);
+      const desc = (el("mDesc").value || "").trim();
+      const notes = el("mNotes").value || "";
+
+      if(!desc){ alert("Informe uma descrição."); return; }
+      if(!(amountInput>0)){ alert("Informe um valor maior que zero."); return; }
+
+      const installments = clamp(Number(el("mInstallments").value||1), 1, 60);
+      const rate = Math.max(0, Number(el("mInterest").value||0))/100;
+
+      // convert
+      const conv = convertToBRL(amountInput, currency, dateISO);
+      if(currency==="USD" && !conv.fxUsed){
+        alert("Sem cotação USD→BRL salva para o mês desse lançamento. Vá em Regras e salve a cotação.");
+        return;
+      }
+
+      const subcatId = el("mSubcat").value;
+      const sub = getSubcat(subcatId);
+      if(!sub){
+        alert("Selecione uma subcategoria.");
+        return;
+      }
+      if(type==="in" && sub.type!=="income"){
+        alert("Para Entrada, selecione uma subcategoria de Receita.");
+        return;
+      }
+      if(type==="out" && sub.type!=="expense"){
+        alert("Para Saída, selecione uma subcategoria de Despesa.");
+        return;
+      }
+
+      // payment/account logic
+      let payMethod = "—";
+      let cardId = null;
+      let accountId = null;
+      let fromId = null;
+      let toId = null;
+
+      if(type==="in"){
+        // entrada sempre entra em conta
+        accountId = el("mAccount").value || state.accounts[0]?.id;
+      }else if(type==="out"){
+        payMethod = el("mPay").value || "PIX";
+        if(payMethod==="Cartão"){
+          cardId = el("mCard").value || state.cards[0]?.id;
+          // não mexe no saldo (sem accountId)
+          accountId = null;
+        }else{
+          accountId = el("mAccount").value || state.accounts[0]?.id;
+        }
+      }else if(type==="transfer"){
+        fromId = el("mFrom").value || state.accounts[0]?.id;
+        toId = el("mTo").value || state.accounts[0]?.id;
+        if(fromId===toId){ alert("Origem e destino não podem ser iguais."); return; }
+      }
+
+      const baseMeta = {};
+      const txBase = {
+        date: dateISO,
+        type,
+        desc,
+        subcatId,
+        payMethod,
+        cardId,
+        accountId,
+        fromId,
+        toId,
+        notes,
+        currency,
+        amountOriginal: amountInput,
+        amountBRL: conv.brl,
+        fxUsed: conv.fxUsed,
+        fxMonth: conv.fxMonth,
+        createdAt: Date.now(),
+        meta: { ...baseMeta }
+      };
+
+      // parcelas (Price) - aplica em out (inclui cartão)
+      if(type==="out" && installments>1){
+        const payment = (rate>0) ? ( (()=>{
+          const PV = conv.brl;
+          const pow = Math.pow(1+rate, installments);
+          return PV * (rate*pow)/(pow-1);
+        })() ) : (conv.brl / installments);
+
+        const gid = uid();
+        for(let k=1;k<=installments;k++){
+          const d = parseDateISO(dateISO);
+          const dd = new Date(d.getFullYear(), d.getMonth()+ (k-1), d.getDate());
+          const iso = toISODate(dd);
+
+          const t = {
+            ...txBase,
+            id: `${gid}_${k}`,
+            date: iso,
+            desc: `${desc} (${k}/${installments})`,
+            amountBRL: Number(payment.toFixed(2)),
+            createdAt: Date.now(),
+            meta: { installment:{ groupId:gid, index:k, total:installments, rate } }
+          };
+          state.tx.push(t);
+        }
+        save();
+        renderAll();
+        closeModal();
+        return;
+      }
+
+      if(state.editingId){
+        const idx = state.tx.findIndex(t=>t.id===state.editingId);
+        if(idx<0) return;
+
+        // se editar um item que é parcela de grupo, aqui edita só ele
+        state.tx[idx] = { ...state.tx[idx], ...txBase, id: state.tx[idx].id };
+      }else{
+        state.tx.push({ ...txBase, id: uid() });
+      }
+
+      save();
+      renderAll();
+      closeModal();
+    }
+
+    // ===== EXPORT/IMPORT =====
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "financeiro_gabriel_backup.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importJSON(file){
+      const txt = await file.text();
+      try{
+        const data = JSON.parse(txt);
+        Object.assign(state, data);
+        save();
+        initUI(true);
+      }catch(e){
+        alert("JSON inválido.");
+      }
+    }
+
+    // ===== EVENTS =====
+    function bindEvents(){
+      // tabs
+      $$(".nav button").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          $$(".nav button").forEach(x=>x.classList.remove("active"));
+          b.classList.add("active");
+          const tab = b.dataset.tab;
+
+          $$(".tabs").forEach(t=>t.classList.remove("active"));
+          el("tab-"+tab).classList.add("active");
+
+          const titles = {
+            dashboard:["Dashboard","Gráficos e indicadores"],
+            resumo:["Resumo","3 barras + detalhamento ao clicar"],
+            lancamentos:["Lançamentos","Tabela completa"],
+            regras:["Regras & Categorias","Gerencie grupos e subcategorias"],
+            config:["Contas & Cartões","Relatório calendário do cartão"]
+          };
+          el("pageTitle").textContent = titles[tab][0];
+          el("pageSubtitle").textContent = titles[tab][1];
+
+          renderAll();
+        });
+      });
+
+      // theme
+      el("btnTheme").addEventListener("click", ()=>{
+        state.theme = (state.theme==="light" ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", state.theme==="light" ? "light":"dark");
+        save();
+      });
+
+      // new tx
+      el("btnAdd").addEventListener("click", ()=> openModal("new"));
+      el("btnClose").addEventListener("click", closeModal);
+      el("modal").addEventListener("click", (e)=>{ if(e.target.id==="modal") closeModal(); });
+      el("btnSave").addEventListener("click", upsertTx);
+      el("btnDelete").addEventListener("click", ()=>{
+        if(!state.editingId) return;
+        deleteTx(state.editingId);
+      });
+
+      // modal changes
+      ["mType","mCurrency","mAmount","mDate","mPay"].forEach(id=>{
+        el(id).addEventListener("input", updateModalVisibility);
+        el(id).addEventListener("change", updateModalVisibility);
+      });
+
+      // export/import
+      el("btnExportJSON").addEventListener("click", exportJSON);
+      el("fileImport").addEventListener("change", async (e)=>{
+        const f = e.target.files?.[0];
+        if(!f) return;
+        await importJSON(f);
+        e.target.value = "";
+      });
+
+      // filters
+      ["budgetMonth","fStart","fEnd","fType","fSubcat","fPay","fSearch"].forEach(id=>{
+        el(id).addEventListener("input", ()=>{ applyFiltersFromUI(); renderAll(); });
+        el(id).addEventListener("change", ()=>{ applyFiltersFromUI(); renderAll(); });
+      });
+
+      el("btnThisMonth").addEventListener("click", ()=>{
+        const now = new Date();
+        const mk = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+        state.budgetMonth = mk;
+        el("budgetMonth").value = mk;
+        applyFiltersFromUI();
+        renderAll();
+      });
+      el("btnAll").addEventListener("click", ()=>{
+        el("fStart").value = "";
+        el("fEnd").value = "";
+        applyFiltersFromUI();
+        renderAll();
+      });
+
+      el("btnClearFilters").addEventListener("click", ()=>{
+        state.filters = { start:null, end:null, type:"all", subcat:"all", pay:"all", search:"" };
+        fillFilters();
+        applyFiltersFromUI();
+        renderAll();
+      });
+
+      el("btnReset").addEventListener("click", ()=>{
+        const ok = confirm("Isso apaga todos os dados salvos neste navegador. Continuar?");
+        if(!ok) return;
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      });
+
+      // sorting
+      $$("thead th[data-sort]").forEach(th=>{
+        th.addEventListener("click", ()=>{
+          const key = th.getAttribute("data-sort");
+          if(state.sort.key===key) state.sort.dir = (state.sort.dir==="asc" ? "desc":"asc");
+          else{
+            state.sort.key = key;
+            state.sort.dir = (key==="date" ? "desc" : "asc");
+          }
+          save();
+          renderTransactions();
+        });
+      });
+
+      // FX controls
+      el("fixedUSD").addEventListener("input", ()=>{
+        state.fixedSalaryUSD = Number(el("fixedUSD").value||0);
+        save();
+        renderAll();
+      });
+
+      el("btnFxNow").addEventListener("click", async ()=>{
+        const mk = el("fxMonthPick").value || state.budgetMonth;
+        await ensureFx(mk, true);
+        renderAll();
+      });
+      el("btnFxSave").addEventListener("click", ()=>{
+        const mk = el("fxMonthPick").value || state.budgetMonth;
+        const r = Number(el("fxManual").value||0);
+        if(!setFxManual(mk, r)){
+          alert("Informe uma cotação válida.");
+          return;
+        }
+        renderAll();
+      });
+
+      // Add group
+      el("btnAddGroup").addEventListener("click", ()=>{
+        const name = (el("newGroupName").value||"").trim();
+        const pct = clamp(Number(el("newGroupPct").value||0), 0, 100);
+        if(!name){ alert("Informe o nome do grupo."); return; }
+        const id = uid().slice(0,8);
+        state.groups.push({ id, name, pct, enabled:true });
+        el("newGroupName").value = "";
+        save();
+        renderAll();
+      });
+
+      // Add subcat
+      el("btnAddSubcat").addEventListener("click", ()=>{
+        const name = (el("newSubName").value||"").trim();
+        const type = el("newSubType").value;
+        const gid = el("newSubGroup").value;
+
+        if(!name){ alert("Informe o nome da subcategoria."); return; }
+
+        const id = uid().slice(0,10);
+        const sub = { id, name, type, groupId: (type==="expense" ? gid : null), include:true };
+        state.subcats.push(sub);
+        el("newSubName").value = "";
+        save();
+        renderAll();
+      });
+
+      // Accounts
+      el("btnAddAccount").addEventListener("click", ()=>{
+        const name = (el("accName").value||"").trim();
+        const opening = Number(el("accOpening").value||0);
+        if(!name){ alert("Informe nome da conta."); return; }
+        state.accounts.push({ id: uid().slice(0,10), name, opening });
+        el("accName").value="";
+        el("accOpening").value="0";
+        save();
+        renderAll();
+      });
+
+      // Cards
+      el("btnAddCard").addEventListener("click", ()=>{
+        const name = (el("cardName").value||"").trim();
+        const limit = Number(el("cardLimit").value||0);
+        if(!name){ alert("Informe nome do cartão."); return; }
+        state.cards.push({ id: uid().slice(0,10), name, limit });
+        el("cardName").value="";
+        save();
+        renderAll();
+      });
+    }
+
+    // ===== INIT / RENDER ALL =====
+    async function initUI(fromImport=false){
+      document.documentElement.setAttribute("data-theme", state.theme==="light" ? "light":"dark");
+
+      // default month
+      if(!state.budgetMonth) state.budgetMonth = nowMonthKey();
+      el("budgetMonth").value = state.budgetMonth;
+
+      // ensure fx month
+      await ensureFx(state.budgetMonth);
+
+      // fill
+      fillFilters();
+      fillModalSelects();
+
+      // show fx
+      renderAll();
+    }
+
+    function renderAll(){
+      applyFiltersFromUI();
+      ensureFx(state.budgetMonth); // background
+
+      renderSide();
+      renderFxNote();
+      renderChips();
+      renderMonthSummary();
+
+      renderGroups();
+      renderGroupDetails();
+
+      renderTransactions();
+
+      renderAdminGroups();
+      renderAdminSubcats();
+
+      renderAccounts();
+      renderCards();
+
+      renderCharts();
+
+      save();
+    }
+
+    // ===== START =====
+    function init(){
+      load();
+
+      // defaults if empty
+      if(!state.tx) state.tx = [];
+      if(!state.fxByMonth) state.fxByMonth = {};
+      if(!state.filters) state.filters = { start:null, end:null, type:"all", subcat:"all", pay:"all", search:"" };
+      if(!state.sort) state.sort = { key:"date", dir:"desc" };
+
+      bindEvents();
+      initUI();
+    }
+
+    init();
+  </script>
+</body>
+</html>
