@@ -1822,8 +1822,9 @@
           : (t._bal==null ? `<span class="muted">—</span>` : money(t._bal));
 
         const tr = document.createElement("tr");
+        const dateObj = parseDateISO(t.date);
         tr.innerHTML = `
-          <td>${new Date(t.date).toLocaleDateString("pt-BR")}</td>
+          <td>${dateObj ? dateObj.toLocaleDateString("pt-BR") : "—"}</td>
           <td><span class="tag">${typeLabel}</span></td>
           <td>${(t.desc||"")}${fxLine}</td>
           <td>${group ? `<span class="tag">${group.name}</span>` : `<span class="muted">—</span>`}</td>
